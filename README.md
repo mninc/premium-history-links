@@ -5,7 +5,7 @@ Get all the history links from a premium search page so you can give them to ano
 ## Installation
 
 1. Install [Greasemonkey (Firefox)](http://www.greasespot.net/) or [Tampermonkey (Chrome)](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo).
-2. Open the [script in raw view](https://github.com/mninc/premium-history-links/raw/master/premium-history-links.js).
+2. Open the [script in raw view](https://github.com/mninc/premium-history-links/raw/master/premium-history-links.user.js).
 3. Install.
 
 

@@ -9,7 +9,7 @@
 
 // @homepageURL     https://github.com/mninc/premium-history-links
 // @supportURL      https://github.com/mninc/premium-history-links/issues
-// @downloadURL     https://github.com/mninc/premium-history-links/raw/master/premium-history-links.js
+// @downloadURL     https://github.com/mninc/premium-history-links/raw/master/premium-history-links.user.js
 
 // @run-at       document-end
 // @match        https://backpack.tf/premium/search*
