@@ -1,6 +1,6 @@
 # premium history links
 
-Get all the history links from a premium search page so you can give them to another user to suggest.
+Get all the in-date history links from a premium search page so you can give them to another user to suggest.
 
 ## Installation
 
