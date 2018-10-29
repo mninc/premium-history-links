@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         premium history links
 // @namespace    https://steamcommunity.com/id/manic_/
-// @version      1.2
+// @version      1.3
 // @description  all the history links to copy and paste
 // @author       manic
 // @grant        none
@@ -20,6 +20,7 @@
 
 
     function run() {
+        let current_time = new Date();
 
         // side column
         let col = document.getElementsByClassName("col-md-4")[0];
@@ -32,127 +33,97 @@
         header.innerHTML = "Links";
         div.appendChild(header);
 
-        if (document.getElementsByClassName("well well-sm").length === 0) {
-            // has premium
+        if (document.getElementsByClassName("well well-sm").length === 0) {  // has premium
 
-            // click all 'last-exchanged' buttons
-            let last_exchanged = document.getElementsByClassName("btn btn-default btn-xs btn-last-exchanged");
-            for (let i = 0; i < last_exchanged.length; i++) {
-                last_exchanged[i].click();
+
+            let links2 = [];
+            let links3 = [];
+
+            let results = document.getElementsByClassName("result");
+            for (let i = 0; i < results.length; i++) {
+                let result = results[i];
+
+                let link = result.getElementsByClassName("btn btn-default btn-xs")[1].href;
+                let abbreviations = result.getElementsByTagName("abbr");
+                if (abbreviations.length !== 2) continue;  // it has never been exchanged
+                let days_old = (current_time - new Date(abbreviations[1].title)) / 1000 / 60 / 60 / 24;
+
+                if (days_old > 90) continue;
+                links3.push(link);
+                if (days_old > 60) continue;
+                links2.push(link);
+
             }
 
-            function wait() {
-                let ok = true;
-                last_exchanged = document.getElementsByClassName("btn btn-default btn-xs btn-last-exchanged");
-                for (let i = 0; i < last_exchanged.length; i++) {
-                    if (last_exchanged[i].innerText !== "Never") ok = false;
-                }
 
-                if (!ok) {
-                    // not all last-exchanged buttons loaded yet
-                    setTimeout(wait, 100);
+            let p = document.createElement("p");
+            p.className = "warning";
+
+            let small = document.createElement("small");
+            small.className = "text-muted";
+            small.innerHTML = "All in-date history links on this page. Clicking the text box will automatically copy the links to clipboard.";
+            p.appendChild(small);
+            div.appendChild(p);
+
+            let toggle = document.createElement("div");
+            toggle.className = "buttons btn-group";
+
+            for (let i = 0; i < 2; i++) {
+                let option = document.createElement("a");
+                if (i === 0) {
+                    option.innerText = "2 months";
+                    option.id = "two_months";
+
                 } else {
-                    let links2 = [];
-                    let links3 = [];
-
-                    let button_groups = document.getElementsByClassName("buttons btn-group");
-                    for (let i = 0; i < button_groups.length; i++) {
-                        let group = button_groups[i];
-
-                        // get last exchange a
-                        let last_exchange;
-                        if (group.getElementsByClassName("btn btn-default btn-xs btn-last-exchanged").length > 0) {
-                            // Never exchanged
-                            continue;
-                        } else if (group.getElementsByClassName("btn btn-xs btn-last-exchanged btn-warning").length > 0) {
-                            last_exchange = group.getElementsByClassName("btn btn-xs btn-last-exchanged btn-warning")[0];
-                        } else if (group.getElementsByClassName("btn btn-xs btn-last-exchanged btn-success").length > 0) {
-                            last_exchange = group.getElementsByClassName("btn btn-xs btn-last-exchanged btn-success")[0];
-                        } else {
-                            continue;
-                        }
-
-                        let days_old = parseInt(last_exchange.innerText.split(" ")[0]);
-                        if (days_old > 90) continue;
-                        links3.push("https://backpack.tf/item/" + last_exchange.getAttribute("data-original-id").toString());
-                        if (days_old > 60) continue;
-                        links2.push("https://backpack.tf/item/" + last_exchange.getAttribute("data-original-id").toString());
-
-
-                    }
-
-                    let p = document.createElement("p");
-                    p.className = "warning";
-
-                    let small = document.createElement("small");
-                    small.className = "text-muted";
-                    small.innerHTML = "All in-date history links on this page. Clicking the text box will automatically copy the links to clipboard.";
-                    p.appendChild(small);
-                    div.appendChild(p);
-
-                    let toggle = document.createElement("div");
-                    toggle.className = "buttons btn-group";
-
-                    for (let i = 0; i < 2; i++) {
-                        let option = document.createElement("a");
-                        if (i === 0) {
-                            option.innerText = "2 months";
-                            option.id = "two_months";
-
-                        } else {
-                            option.innerText = "3 months";
-                            option.id = "three_months";
-                            option.style["background-color"] = "#e6e6e6";
-                            option.style["border-color"] = "#adadad";
-                        }
-                        option.className = "btn btn-default btn-xs";
-                        option.onclick = function() {
-                            let other;
-                            let box = document.getElementById("box");
-                            if (this.id === "three_months") {
-                                other = document.getElementById("two_months");
-                                box.rows = links3.length;
-                                box.value = links3.join("\n");
-                            } else {
-                                other = document.getElementById("three_months");
-                                box.rows = links2.length;
-                                box.value = links2.join("\n");
-                            }
-
-                            this.style["background-color"] = "#e6e6e6";
-                            this.style["border-color"] = "#adadad";
-                            other.style["background-color"] = "#fff";
-                            other.style["border-color"] = "#ccc";
-
-
-                        };
-                        toggle.appendChild(option);
-                    }
-                    div.appendChild(toggle);
-
-
-                    let box = document.createElement("textarea");
-                    box.readonly;
-                    box.spellcheck = false;
-                    box.onclick = function() {this.focus();this.select();document.execCommand('copy');};
-                    box.cols = 35;
-                    box.rows = links3.length;
-                    box.value = links3.join("\n");
-                    box.id = "box";
-                    div.appendChild(box);
-
-                    col.appendChild(div);
-
+                    option.innerText = "3 months";
+                    option.id = "three_months";
+                    option.style["background-color"] = "#e6e6e6";
+                    option.style["border-color"] = "#adadad";
                 }
+                option.className = "btn btn-default btn-xs";
+                option.onclick = function() {
+                    let other;
+                    let box = document.getElementById("box");
+                    if (this.id === "three_months") {
+                        other = document.getElementById("two_months");
+                        box.rows = links3.length;
+                        box.value = links3.join("\n");
+                    } else {
+                        other = document.getElementById("three_months");
+                        box.rows = links2.length;
+                        box.value = links2.join("\n");
+                    }
 
+                    this.style["background-color"] = "#e6e6e6";
+                    this.style["border-color"] = "#adadad";
+                    other.style["background-color"] = "#fff";
+                    other.style["border-color"] = "#ccc";
+
+
+                };
+                toggle.appendChild(option);
             }
-            wait();
+            div.appendChild(toggle);
+
+
+            let box = document.createElement("textarea");
+            box.readonly;
+            box.spellcheck = false;
+            box.onclick = function() {this.focus();this.select();document.execCommand('copy');};
+            box.cols = 35;
+            box.rows = links3.length;
+            box.value = links3.join("\n");
+            box.id = "box";
+            div.appendChild(box);
+
+            col.appendChild(div);
 
 
 
 
-        } else {
-            // does not have premium
+
+
+        } else {  // does not have premium
             let p, small;
 
 
