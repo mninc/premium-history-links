@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         premium history links
 // @namespace    https://steamcommunity.com/id/manic_/
-// @version      1.3
+// @version      1.4
 // @description  all the history links to copy and paste
 // @author       manic
 // @grant        none
@@ -17,6 +17,8 @@
 
 (function() {
     'use strict';
+
+    let chosen = 3;
 
 
     function run() {
@@ -88,10 +90,12 @@
                         other = document.getElementById("two_months");
                         box.rows = links3.length;
                         box.value = links3.join("\n");
+                        chosen = 3;
                     } else {
                         other = document.getElementById("three_months");
                         box.rows = links2.length;
                         box.value = links2.join("\n");
+                        chosen = 2;
                     }
 
                     this.style["background-color"] = "#e6e6e6";
@@ -103,7 +107,27 @@
                 };
                 toggle.appendChild(option);
             }
+
             div.appendChild(toggle);
+            div.insertAdjacentHTML("beforeend", "&nbsp;");
+
+            let toggle2 = toggle.cloneNode(false);
+            let open_all = document.createElement("a");
+            open_all.innerHTML = '<p data-tip="top" data-original-title="You may have to allow popups from backpack.tf before this will work.">Open All</p>';
+            open_all.className = "btn btn-default btn-xs";
+            open_all.onclick = function() {
+                if (chosen === 2) {
+                    links2.forEach(function(link){
+                        window.open(link, "_blank");
+                    });
+                } else {
+                    links3.forEach(function(link){
+                        window.open(link, "_blank");
+                    });
+                }
+            };
+            toggle2.appendChild(open_all);
+            div.appendChild(toggle2);
 
 
             let box = document.createElement("textarea");
@@ -117,10 +141,6 @@
             div.appendChild(box);
 
             col.appendChild(div);
-
-
-
-
 
 
         } else {  // does not have premium
@@ -142,5 +162,6 @@
             col.appendChild(div);
         }
     }
+
     window.onload = run;
 })();
